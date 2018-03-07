@@ -8,7 +8,13 @@ square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','45
 unitlist = row_units + column_units + square_units
 
 # TODO: Update the unit list to add the new diagonal units
-unitlist = unitlist
+col_list = list(cols)
+left_diagonal_unit = [r+c for r in rows for c in col_list.pop(0)]
+
+col_list = list(cols)
+right_diagonal_unit = [r+c for r in rows for c in col_list.pop(-1)]
+
+unitlist = unitlist + left_diagonal_unit + right_diagonal_unit
 
 
 # Must be called after all units (including diagonals) are added to the unitlist
@@ -43,8 +49,48 @@ def naked_twins(values):
     and because it is simpler (since the reduce_puzzle function already calls this
     strategy repeatedly).
     """
-    # TODO: Implement this function!
-    raise NotImplementedError
+    print("\n\n---------------------------------------")
+    print("            BEFORE")
+    print("---------------------------------------\n")
+    display(values)
+    # duplicates = {}
+    print(units)
+    for unit in units:
+        # print(unit)
+        dual_boxes = [box for box in unit if len(values[box]) == 2] # boxes containing 2 digits
+        box_values = [values[box] for box in dual_boxes]
+        # twins = set([value for value in box_values if box_values.count(value) == 2])
+        twins = set([value for value in box_values if box_values.count(value) == 2]) # list of twin values
+        # print(twins)
+        if twins:
+            twin_boxes = [box for box in unit if values[box] in twins]
+            # print(twin_boxes)
+            for box in twin_boxes:
+                # print(box, units[box])
+                the_units = units[box]
+                for the_unit in the_units:
+                    # contain_duplicates = set([dp_box for dp_box in the_unit for i in list(values[box]) if box != dp_box if i in values[dp_box]])
+                    contain_duplicates = set([dp_box for dp_box in the_unit for i in list(values[box]) if box != dp_box if i in values[dp_box]])
+                    # print(contain_duplicates)
+                    # print([values[d] for d in contain_duplicates])
+                    for dup in contain_duplicates:
+                        for item in list(values[box]):
+                            if(len(values[dup]) > 2):
+                                values[dup] = values[dup].replace(item, '')
+
+    print("\n\n---------------------------------------")
+    print("            AFTER")
+    print("---------------------------------------\n")
+    display(values)
+                
+            # for box in twin_boxes
+            # print(twins)
+            # for i, box in twins:
+            #     print(dual_boxes[box])
+            # get the cells that have those values
+            # print([dual_boxes[box] for box in twins])
+                
+    return values
 
 
 def eliminate(values):
