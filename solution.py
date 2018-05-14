@@ -14,7 +14,7 @@ left_diagonal_unit = [r+c for r in rows for c in col_list.pop(0)]
 col_list = list(cols)
 right_diagonal_unit = [r+c for r in rows for c in col_list.pop(-1)]
 
-unitlist = unitlist + left_diagonal_unit + right_diagonal_unit
+unitlist = unitlist + [left_diagonal_unit] + [right_diagonal_unit]
 
 
 # Must be called after all units (including diagonals) are added to the unitlist
@@ -49,29 +49,27 @@ def naked_twins(values):
     and because it is simpler (since the reduce_puzzle function already calls this
     strategy repeatedly).
     """
-    # print("\n\n---------------------------------------")
-    # print("            BEFORE")
-    # print("---------------------------------------\n")
-    # display(values)
-    
-    # print(units)
-    for cell_key, cell_peers in peers.items():
-        cell_value = values[cell_key]
-        peer_values = [values[cp] for cp in cell_peers]
-        # print(peer_values)
-        if len(cell_value) == 2:
-            duplicates = [pv for pv in peer_values if pv == cell_value] 
-            # print(cell_key, ': ', duplicates)
-        
-            # replace all cells that conatins any of the digits in the duplicate
-            for duplicate in duplicates:
-                for cp in cell_peers:
-                    for digit in duplicate:
-                        if digit in values[cp]:
-                            values[cp] = values[cp].replace(digit, '')
+    twin_boxes = [box for box in values.keys() if len(values[box])==2]
+    twin_values = [values[box] for box in values.keys() if len(values[box])==2]
+    twin_left = []
+    twin_right = []
+    pair_values = []
+    for i in range(len(twin_boxes)) : 
+        for j in range (i+1,len(twin_boxes)) :
+            if twin_values[j] == twin_values[i] and twin_boxes[j] in peers[twin_boxes[i]]:
+                twin_left.append(twin_boxes[i])
+                twin_right.append(twin_boxes[j])
+                pair_values.append(twin_values[i])
 
-        # box_peers = peers[box]
-        # print(box_peers)
+    for unit in unitlist:
+        for i in range(len(twin_left)):
+            if twin_left[i] in unit and twin_right[i] in unit :
+                for digit in pair_values[i] :
+                    for box in unit : 
+                        if box != twin_left[i] and box != twin_right[i] :
+                            values[box] = values[box].replace(digit,'') 
+
+    return values
 
 
 
